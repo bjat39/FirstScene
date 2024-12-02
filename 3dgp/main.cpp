@@ -16,6 +16,8 @@ using namespace glm;
 
 // 3D models
 C3dglModel camera;
+C3dglModel table;
+C3dglModel vase;
 
 // The View Matrix
 mat4 matrixView;
@@ -40,6 +42,8 @@ bool init()
 
 	// load your 3D models here!
 	if (!camera.load("models\\camera.3ds")) return false;
+	if (!table.load("models\\table.obj")) return false;
+	if (!vase.load("models\\vase.obj")) return false;
 
 	// Initialise the View Matrix (initial position of the camera)
 	matrixView = rotate(mat4(1), radians(12.f), vec3(1, 0, 0));
@@ -72,11 +76,20 @@ void renderScene(mat4& matrixView, float time, float deltaTime)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, rgbaGrey);	// --- DEPRECATED
 
 	// camera
+	/*
 	m = matrixView;
 	m = translate(m, vec3(-3.0f, 0, 0.0f));
 	m = rotate(m, radians(180.f), vec3(0.0f, 1.0f, 0.0f));
 	m = scale(m, vec3(0.04f, 0.04f, 0.04f));
 	camera.render(m);
+	*/
+
+	// table
+	m = matrixView;
+	m = translate(m, vec3(0.0f, 0.0f, 0.0f));
+	m = rotate(m, radians(0.f), vec3(0.0f, 0.0f, 0.0f));
+	m = scale(m, vec3(1.0f, 1.0f, 1.0f));
+	table.render(m);
 
 	// setup materials - blue
 	GLfloat rgbaBlue[] = { 0.2f, 0.2f, 0.8f, 1.0f };		// --- DEPRECATED
