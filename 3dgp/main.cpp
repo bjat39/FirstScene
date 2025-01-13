@@ -87,8 +87,8 @@ void renderScene(mat4& matrixView, float time, float deltaTime)
 	// table
 	m = matrixView;
 	m = translate(m, vec3(0.0f, 0.0f, 0.0f));
-	m = rotate(m, radians(0.f), vec3(0.0f, 0.0f, 0.0f));
-	m = scale(m, vec3(1.0f, 1.0f, 1.0f));
+	m = rotate(m, radians(0.f), vec3(0.0f, 1.0f, 0.0f));
+	m = scale(m, vec3(0.005f, 0.005f, 0.005f));
 	table.render(m);
 
 	// setup materials - blue
