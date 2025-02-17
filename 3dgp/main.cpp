@@ -14,6 +14,9 @@ using namespace std;
 using namespace _3dgl;
 using namespace glm;
 
+// GLSL Program
+C3dglProgram program;
+
 // 3D models
 C3dglModel camera;
 C3dglModel table;
@@ -30,15 +33,26 @@ float _fov = 60.f;		// field of view (zoom)
 
 bool init()
 {
+	// Initialise Shaders
+	C3dglShader vertexShader;
+	C3dglShader fragmentShader;
+	if (!vertexShader.create(GL_VERTEX_SHADER)) return false;
+	if (!vertexShader.loadFromFile("shaders/basic.vert")) return false;
+	if (!vertexShader.compile()) return false;
+	if (!fragmentShader.create(GL_FRAGMENT_SHADER)) return false;
+	if (!fragmentShader.loadFromFile("shaders/basic.frag")) return false;
+	if (!fragmentShader.compile()) return false;
+	if (!program.create()) return false;
+	if (!program.attach(vertexShader)) return false;
+	if (!program.attach(fragmentShader)) return false;
+	if (!program.link()) return false;
+	if (!program.use(true)) return false;
+
 	// rendering states
 	glEnable(GL_DEPTH_TEST);	// depth test is necessary for most 3D scenes
 	glEnable(GL_NORMALIZE);		// normalization is needed by AssImp library models
 	glShadeModel(GL_SMOOTH);	// smooth shading mode is the default one; try GL_FLAT here!
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	// this is the default one; try GL_LINE!
-
-	// setup lighting
-	glEnable(GL_LIGHTING);									// --- DEPRECATED
-	glEnable(GL_LIGHT0);									// --- DEPRECATED
 
 	// load your 3D models here!
 	if (!camera.load("models\\camera.3ds")) return false;
@@ -71,9 +85,7 @@ void renderScene(mat4& matrixView, float time, float deltaTime)
 	mat4 m;
 
 	// setup materials - grey
-	GLfloat rgbaGrey[] = { 0.6f, 0.6f, 0.6f, 1.0f };		// --- DEPRECATED
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, rgbaGrey);	// --- DEPRECATED
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, rgbaGrey);	// --- DEPRECATED
+	program.sendUniform("material", vec3(0.6f, 0.6f, 0.6f));
 
 	// camera
 	/*
@@ -91,20 +103,10 @@ void renderScene(mat4& matrixView, float time, float deltaTime)
 	m = scale(m, vec3(0.005f, 0.005f, 0.005f));
 	table.render(m);
 
-	// setup materials - blue
-	GLfloat rgbaBlue[] = { 0.2f, 0.2f, 0.8f, 1.0f };		// --- DEPRECATED
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, rgbaBlue);	// --- DEPRECATED
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, rgbaBlue);	// --- DEPRECATED
+	//program.sendUniform("material", vec3(0.6f, 0.6f, 0.6f));
 
-	// teapot
-	m = matrixView;
-	m = translate(m, vec3(15.0f, 0, 0.0f));
-	m = rotate(m, radians(120.f), vec3(0.0f, 1.0f, 0.0f));
 	// the GLUT objects require the Model View Matrix setup
-	glMatrixMode(GL_MODELVIEW);								// --- DEPRECATED
-	glLoadIdentity();										// --- DEPRECATED
-	glMultMatrixf((GLfloat*)&m);							// --- DEPRECATED
-	glutSolidTeapot(2.0);
+	program.sendUniform("matrixModelView", m);
 }
 
 void onRender()
@@ -145,9 +147,7 @@ void onReshape(int w, int h)
 	mat4 matrixProjection = perspective(radians(_fov), ratio, 0.02f, 1000.f);
 
 	// Setup the Projection Matrix
-	glMatrixMode(GL_PROJECTION);							// --- DEPRECATED
-	glLoadIdentity();										// --- DEPRECATED
-	glMultMatrixf((GLfloat*)&matrixProjection);				// --- DEPRECATED
+	program.sendUniform("matrixProjection", matrixProjection);
 }
 
 // Handle WASDQE keys
