@@ -59,6 +59,9 @@ bool init()
 	if (!table.load("models\\table.obj")) return false;
 	if (!vase.load("models\\vase.obj")) return false;
 
+	table.loadMaterials("models\\table\\");
+	vase.loadMaterials("models\\vase\\");
+
 	// Initialise the View Matrix (initial position of the camera)
 	matrixView = rotate(mat4(1), radians(12.f), vec3(1, 0, 0));
 	matrixView *= lookAt(
@@ -67,7 +70,7 @@ bool init()
 		vec3(0.0, 1.0, 0.0));
 
 	// setup the screen background colour
-	glClearColor(0.18f, 0.25f, 0.22f, 1.0f);   // deep grey background
+	glClearColor(0.2f, 0.2f, 0.2f, 1.0f);   // deep grey background
 
 	cout << endl;
 	cout << "Use:" << endl;
